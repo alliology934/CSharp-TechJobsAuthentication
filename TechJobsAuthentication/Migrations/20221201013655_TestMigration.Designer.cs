@@ -10,8 +10,8 @@ using TechJobsAuthentication.Data;
 namespace TechJobsAuthentication.Migrations
 {
     [DbContext(typeof(JobDbContext))]
-    [Migration("20221110192523_DOTNETUpdate")]
-    partial class DOTNETUpdate
+    [Migration("20221201013655_TestMigration")]
+    partial class TestMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

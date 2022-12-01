@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,11 +27,31 @@ namespace TechJobsAuthentication
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddRazorPages();
 
             var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
             var defaultConnection = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<JobDbContext>(options =>
             options.UseMySql(defaultConnection, serverVersion));
+            services.AddDefaultIdentity<IdentityUser>
+            (options =>
+            {
+                options.SignIn.RequireConfirmedAccount = true;
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireLowercase = false;
+            }).AddEntityFrameworkStores<JobDbContext>();
+            /*
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                options.LoginPath = "/Identity/Account/Login";
+                options.SlidingExpiration = true;
+            });
+            */
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +72,7 @@ namespace TechJobsAuthentication
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -58,6 +80,8 @@ namespace TechJobsAuthentication
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
+                endpoints.MapRazorPages();
             });
         }
     }
